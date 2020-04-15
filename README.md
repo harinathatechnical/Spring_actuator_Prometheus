@@ -503,7 +503,9 @@ Follow the steps below to import metrics from Prometheus and visualize them on G
 1. Add the Prometheus data source in Grafana
 ![promethos image](https://github.com/harinathatechnical/Spring_actuator_Prometheus/blob/master/create_ds_promethous.PNG)
 2. Create a new Dashboard with a Graph
+![dashboard](https://github.com/harinathatechnical/Spring_actuator_Prometheus/blob/master/new_dash_board.PNG)
 3. Add a Prometheus Query expression in Grafana’s query editor
+![query](https://github.com/harinathatechnical/Spring_actuator_Prometheus/blob/master/Query_3.PNG)
 4. Visualize metrics from Grafana’s dashboard
 
 
