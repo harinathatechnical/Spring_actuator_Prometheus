@@ -1,0 +1,11 @@
+package com.test;
+
+import org.springframework.boot.SpringApplication;
+
+@org.springframework.boot.autoconfigure.SpringBootApplication
+public class SpringBootApplicationMonitor {
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootApplicationMonitor.class,args);
+    }
+
+}
