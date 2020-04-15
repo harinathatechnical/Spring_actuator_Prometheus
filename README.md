@@ -507,5 +507,5 @@ Follow the steps below to import metrics from Prometheus and visualize them on G
 4. Visualize metrics from Grafana’s dashboard
 
 
-![graphana image](link-to-image)
+![graphana image](https://github.com/harinathatechnical/Spring_actuator_Prometheus/blob/master/graphana.PNG)
 		
