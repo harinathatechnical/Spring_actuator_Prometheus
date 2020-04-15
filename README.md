@@ -406,6 +406,7 @@ Once you add the above properties, the info endpoint (http://localhost:8090/actu
             
             
 Prometheus
+
 Prometheus is an open-source monitoring system that was originally built by SoundCloud. It consists of the following core components -
 
 A data scraper that pulls metrics data over HTTP periodically at a configured interval.
@@ -415,7 +416,96 @@ A time-series database to store all the metrics data.
 A simple user interface where you can visualize, query, and monitor all the metrics.
 
 Grafana
+
 Grafana allows you to bring data from various data sources like Elasticsearch, Prometheus, Graphite, InfluxDB etc, and visualize them with beautiful graphs.
 
 It also lets you set alert rules based on your metrics data. When an alert changes state, it can notify you over email, slack, or various other channels.
 
+
+Spring Boot uses Micrometer, an application metrics facade to integrate actuator metrics with external monitoring systems.
+
+It supports several monitoring systems like Netflix Atlas, AWS Cloudwatch, Datadog, InfluxData, SignalFx, Graphite, Wavefront, Prometheus etc.
+
+To integrate actuator with Prometheus, you need to add the micrometer-registry-prometheus dependency -
+    
+      <!-- Micrometer Prometheus registry  -->
+	<dependency>
+		<groupId>io.micrometer</groupId>
+		<artifactId>micrometer-registry-prometheus</artifactId>
+	</dependency>
+	
+Once you add the above dependency, Spring Boot will automatically configure a PrometheusMeterRegistry and a CollectorRegistry to collect and export metrics data in a format that can be scraped by a Prometheus server.
+
+All the application metrics data are made available at an actuator endpoint called /prometheus. The Prometheus server can scrape this endpoint to get metrics data periodically.
+
+Let’s explore the prometheus endpoint that is exposed by Spring Boot when micrometer-registry-prometheus dependency is available on the classpath.
+
+First of all, you’ll start seeing the prometheus endpoint on the actuator endpoint-discovery page (http://localhost:8090/actuator) -
+
+The prometheus endpoint exposes metrics data in a format that can be scraped by a Prometheus server. You can see the exposed metrics data by navigating to the prometheus endpoint (http://localhost:8090/actuator/prometheus) -
+
+
+	# HELP jvm_buffer_memory_used_bytes An estimate of the memory that the Java virtual machine is using for this buffer pool
+		# TYPE jvm_buffer_memory_used_bytes gauge
+		jvm_buffer_memory_used_bytes{id="direct",} 81920.0
+		jvm_buffer_memory_used_bytes{id="mapped",} 0.0
+		# HELP jvm_threads_live The current number of live threads including both daemon and non-daemon threads
+		# TYPE jvm_threads_live gauge
+		jvm_threads_live 23.0
+		# HELP tomcat_global_received_bytes_total  
+		# TYPE tomcat_global_received_bytes_total counter
+		tomcat_global_received_bytes_total{name="http-nio-8080",} 0.0
+		# HELP jvm_gc_pause_seconds Time spent in GC pause
+		# TYPE jvm_gc_pause_seconds summary
+		jvm_gc_pause_seconds_count{action="end of minor GC",cause="Allocation Failure",} 7.0
+		jvm_gc_pause_seconds_sum{action="end of minor GC",cause="Allocation Failure",} 0.232
+		jvm_gc_pause_seconds_count{action="end of minor GC",cause="Metadata GC Threshold",} 1.0
+		jvm_gc_pause_seconds_sum{action="end of minor GC",cause="Metadata GC Threshold",} 0.01
+		jvm_gc_pause_seconds_count{action="end of major GC",cause="Metadata GC Threshold",} 1.0
+		jvm_gc_pause_seconds_sum{action="end of major GC",cause="Metadata GC Threshold",} 0.302
+		# HELP jvm_gc_pause_seconds_max Time spent in GC pause
+		# TYPE jvm_gc_pause_seconds_max gauge
+		jvm_gc_pause_seconds_max{action="end of minor GC",cause="Allocation Failure",} 0.0
+		jvm_gc_pause_seconds_max{action="end of minor GC",cause="Metadata GC Threshold",} 0.0
+		jvm_gc_pause_seconds_max{action="end of major GC",cause="Metadata GC Threshold",} 0.0
+		# HELP jvm_gc_live_data_size_bytes Size of old generation memory pool after a full GC
+		# TYPE jvm_gc_live_data_size_bytes gauge
+		jvm_gc_live_data_size_bytes 5.0657472E7
+
+		## More data ......
+		
+Add the below files into Promethues.yml file We need to configure Prometheus to scrape metrics data from Spring Boot Actuator’s /prometheus endpoint.
+	
+		job_name: 'spring-actuator'
+		    metrics_path: '/actuator/prometheus'
+		    scrape_interval: 5s
+		    static_configs:
+		    - targets: ['HOST_IP:8090']
+
+The above configuration file is an extension of the basic configuration file available in the Prometheus documentation.
+
+The most important stuff to note in the above configuration file is the spring-actuator job inside scrape_configs section.
+
+The metrics_path is the path of the Actuator’s prometheus endpoint. The targets section contains the HOST and PORT of your Spring Boot application.
+
+Please make sure to replace the HOST_IP with the IP address of the machine where your Spring Boot application is running. Note that, localhost won’t work here because we’ll be connecting to the HOST machine from the docker container. You must specify the network IP address.
+
+That’s it! You can now navigate to http://localhost:9090 to explore the Prometheus dashboard.
+
+You can enter a Prometheus query expression inside the Expression text field and visualize all the metrics for that query.
+
+Following are some Prometheus graphs for our Spring Boot application’s metrics -
+
+Graphana install and browse using http://localhost:3000/?orgId=1 default admin / admin .
+
+Follow the steps below to import metrics from Prometheus and visualize them on Grafana:
+
+1. Add the Prometheus data source in Grafana
+
+2. Create a new Dashboard with a Graph
+3. Add a Prometheus Query expression in Grafana’s query editor
+4. Visualize metrics from Grafana’s dashboard
+
+
+
+		
