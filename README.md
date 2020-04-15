@@ -501,7 +501,7 @@ Graphana install and browse using http://localhost:3000/?orgId=1 default admin /
 Follow the steps below to import metrics from Prometheus and visualize them on Grafana:
 
 1. Add the Prometheus data source in Grafana
-
+![promethos image](https://github.com/harinathatechnical/Spring_actuator_Prometheus/blob/master/create_ds_promethous.PNG)
 2. Create a new Dashboard with a Graph
 3. Add a Prometheus Query expression in Grafana’s query editor
 4. Visualize metrics from Grafana’s dashboard
