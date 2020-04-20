@@ -510,4 +510,38 @@ Follow the steps below to import metrics from Prometheus and visualize them on G
 
 
 ![graphana image](https://github.com/harinathatechnical/Spring_actuator_Prometheus/blob/master/graphana.PNG)
-		
+
+
+Secure Spring boot actuator prometheus
+
+add the spring security in pom.xml 
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+	
+add the below in application.properties
+  
+      spring.security.user.name=user
+	spring.security.user.password=password
+	spring.security.user.roles=ENDPOINT_ADMIN
+
+	# For Prometheus (and other data loggers)
+	management.endpoint.metrics.enabled=true
+
+	management.metrics.export.prometheus.enabled=true
+
+	endpoints.metrics.sensitive=false
+
+Add below in Promethues.yml file 
+
+	  - job_name: 'spring-actuator'
+	    metrics_path: '/actuator/prometheus'
+	    scrape_interval: 5s
+	    static_configs:
+	    - targets: ['localhost:8090']
+
+	    basic_auth:
+	      username: user
+	      password: password
